@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func getDirectoryListing(directory string) {
+func getDirectoryListing(directory string) map[string]string {
 	dir, err := os.Open(directory)
 	if err != nil {
 		fmt.Println(err)
@@ -19,7 +19,19 @@ func getDirectoryListing(directory string) {
 		os.Exit(1)
 	}
 
+	m := make(map[string]string)
+
 	for _, file := range listing {
-		fmt.Println(file.Name())
+		fullPath := directory + "/" + file.Name()
+		m[file.Name()] = fullPath
+
+		if file.IsDir() {
+			m2 := getDirectoryListing(fullPath)
+			for k, v := range m2 {
+				m[k] = v
+			}
+		}
 	}
+
+	return m
 }
